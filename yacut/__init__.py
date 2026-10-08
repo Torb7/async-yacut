@@ -20,4 +20,4 @@ if app.debug:
         return send_from_directory('..', 'openapi.yml')
 
 
-from . import error_handlers
+from . import error_handlers, views
