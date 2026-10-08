@@ -18,3 +18,6 @@ if app.debug:
     @app.get('/api/openapi.yml')
     def openapi_spec():
         return send_from_directory('..', 'openapi.yml')
+
+
+from . import error_handlers
