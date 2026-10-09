@@ -1,22 +1,10 @@
-import string
-
 from flask import flash, redirect, render_template, url_for
-from nanoid import generate
 
 from . import app, db
+from .error_handlers import InvalidCustomIDError
 from .forms import URLMapForm, FilesForm
-from .models import URLMap
+from .models import get_unique_short_id, URLMap
 from .yandex_disk import async_upload_files_to_yandex_disk
-
-ALPHABET = string.ascii_letters + string.digits
-
-
-def get_unique_short_id():
-    while True:
-        short_id = generate(size=6, alphabet=ALPHABET)
-
-        if not URLMap.query.filter_by(short=short_id).first():
-            return short_id
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -24,28 +12,21 @@ def index_view():
     form = URLMapForm()
 
     if form.validate_on_submit():
-        custom_id = form.custom_id.data
-
-        if custom_id and (
-            URLMap.query.filter_by(short=custom_id).first() is not None
-            or custom_id == 'files'
-        ):
+        try:
+            url_obj = URLMap.create(
+                original=form.original_link.data, custom_id=form.custom_id.data
+            )
             flash(
-                'Предложенный вариант короткой ссылки уже существует.', 'error'
+                url_for(
+                    'redirect_to_original_view',
+                    short=url_obj.short,
+                    _external=True,
+                ),
+                'success',
             )
 
-            return render_template('link.html', form=form)
-
-        short = custom_id if custom_id else get_unique_short_id()
-        url_obj = URLMap(original=form.original_link.data, short=short)
-
-        db.session.add(url_obj)
-        db.session.commit()
-
-        flash(
-            url_for('redirect_to_original_view', short=short, _external=True),
-            'success',
-        )
+        except InvalidCustomIDError as error:
+            flash(str(error), 'error')
 
     return render_template('link.html', form=form)
 

@@ -5,6 +5,10 @@ from flask import jsonify, render_template
 from . import app, db
 
 
+class InvalidCustomIDError(Exception):
+    pass
+
+
 class InvalidAPIUsage(Exception):
     status_code = HTTPStatus.BAD_REQUEST
 
