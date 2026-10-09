@@ -1,18 +1,24 @@
-import string
 import re
 from datetime import datetime
 
 from nanoid import generate
 
+from .constants import (
+    ALPHABET,
+    MAX_LENGTH_ORIGINAL_LINK,
+    MIN_LENGTH_SHORT_ID,
+    MAX_LENGTH_SHORT_ID,
+    DEFAULT_SHORT_ID_LENGTH,
+    SHORT_ID_PATTERN,
+
+)
 from .error_handlers import InvalidCustomIDError
 from yacut import db
-
-ALPHABET = string.ascii_letters + string.digits
 
 
 def get_unique_short_id():
     while True:
-        short_id = generate(size=6, alphabet=ALPHABET)
+        short_id = generate(size=DEFAULT_SHORT_ID_LENGTH, alphabet=ALPHABET)
 
         if not URLMap.query.filter_by(short=short_id).first():
             return short_id
@@ -20,8 +26,10 @@ def get_unique_short_id():
 
 class URLMap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    original = db.Column(db.String(256), nullable=False)
-    short = db.Column(db.String(16), nullable=False, unique=True)
+    original = db.Column(db.String(MAX_LENGTH_ORIGINAL_LINK), nullable=False)
+    short = db.Column(
+        db.String(MAX_LENGTH_SHORT_ID), nullable=False, unique=True
+    )
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
@@ -40,12 +48,12 @@ class URLMap(db.Model):
 
     @staticmethod
     def validate_custom_id(custom_id):
-        if not 1 <= len(custom_id) <= 16:
+        if not MIN_LENGTH_SHORT_ID <= len(custom_id) <= MAX_LENGTH_SHORT_ID:
             raise InvalidCustomIDError(
                 'Указано недопустимое имя для короткой ссылки'
             )
 
-        if not re.fullmatch(r'[A-Za-z0-9]+', custom_id):
+        if not re.fullmatch(SHORT_ID_PATTERN, custom_id):
             raise InvalidCustomIDError(
                 'Указано недопустимое имя для короткой ссылки'
             )
