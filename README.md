@@ -148,8 +148,6 @@ flask run
 ```text
 async-yacut/
 ├── migrations/              # миграции базы данных
-├── postman_collection/       # коллекция и скрипт подготовки данных Postman
-├── tests/                    # тесты приложения
 ├── yacut/
 │   ├── api_views.py          # API-эндпоинты
 │   ├── error_handlers.py     # обработчики ошибок
