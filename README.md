@@ -20,19 +20,18 @@ YaCut — веб-сервис для сокращения ссылок. Поль
 
 - Python 3.12;
 - Flask 3.0;
-- Flask-WTF 1.2;
-- Flask-SQLAlchemy 3.1;
-- Flask-Migrate 4.0;
-- Alembic 1.12;
+- SQLAlchemy 2.0;
+- Alembic;
 - SQLite;
-- aiohttp 3.10;
+- asyncio;
+- aiohttp;
 
 ## Установка и запуск
 
 Клонируйте репозиторий и перейдите в его директорию:
 
 ```bash
-git clone <URL-репозитория>
+git clone https://github.com/Torb7/async-yacut
 cd async-yacut
 ```
 
@@ -61,7 +60,7 @@ pip install -r requirements.txt
 ```dotenv
 FLASK_APP=yacut
 FLASK_ENV=development
-SECRET_KEY=change-me
+SECRET_KEY=<secret_key>
 DATABASE_URI=sqlite:///db.sqlite3
 DISK_TOKEN=<OAuth-токен-Яндекс-Диска>
 ```
